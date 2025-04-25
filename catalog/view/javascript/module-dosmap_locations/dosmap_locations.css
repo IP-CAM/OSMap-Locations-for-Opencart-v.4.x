@@ -1,0 +1,108 @@
+@charset "UTF-8";
+
+/* Elements */
+
+.module-dosmap_locations .description {
+    font-size: 12px;
+    margin: 20px 0;
+}
+
+.module-dosmap_locations .module-dosmap_locations-map {
+    display: grid;
+    grid-template-columns: 640px auto;
+    grid-gap: 50px;
+}
+
+.module-dosmap_locations .module-dosmap_locations-map-inner {
+    height: 450px;
+    position: sticky;
+    top: 30px;
+}
+
+.module-dosmap_locations .dosmap-locations-map-module {
+    height: 100%;
+}
+
+.module-dosmap_locations .module-dosmap_locations-list {
+    padding: 5px 0;
+}
+
+.module-dosmap_locations .module-dosmap_locations-list .list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 5px 50px;
+    list-style-type: none;
+    padding: 0;
+}
+
+.module-dosmap_locations .module-dosmap_locations-list .item button {
+    background: none;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+.module-dosmap_locations .module-dosmap_locations-list .item button:hover {
+    text-decoration: underline;
+}
+
+.module-dosmap_locations .module-dosmap_locations-list .item-coords_not_found {
+    color: #cf0000;
+    font-size: 0.8em;
+}
+
+.module-dosmap_locations .module-dosmap_locations-navigation {
+    border-top: 1px solid #eee;
+    padding: 10px 0 0;
+    margin: 20px 0 0;
+}
+
+.module-dosmap_locations .dosmap-locations-map-module .balloonContentBody p,
+.module-dosmap_locations .dosmap-locations-map-module .balloonContentBody hr {
+    margin: 10px 0;
+}
+
+.module-dosmap_locations .dosmap-locations-map-module .balloonContentBody > p:first-child {
+    margin: 5px 0 10px;
+}
+
+/* @media */
+
+@media (max-width: 1200px) and (min-width: 1000px) {
+    .module-dosmap_locations .module-dosmap_locations-map {
+        grid-template-columns: 46% auto;
+    }
+
+    .module-dosmap_locations .module-dosmap_locations-list .list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 999px) and (min-width: 768px) {
+    .module-dosmap_locations .module-dosmap_locations-map {
+        grid-template-columns: 46% auto;
+    }
+
+    .module-dosmap_locations .module-dosmap_locations-list .list {
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 5px 25px;
+    }
+}
+
+@media (max-width: 767px) {
+    .module-dosmap_locations .module-dosmap_locations-map {
+        grid-template-columns: 1fr;
+        grid-gap: 30px;
+    }
+
+    .module-dosmap_locations .module-dosmap_locations-map-inner {
+        position: relative;
+        top: 0;
+    }
+
+    .module-dosmap_locations .module-dosmap_locations-list .list {
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 10px 25px;
+    }
+}

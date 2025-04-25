@@ -1,0 +1,58 @@
+<div class="module-dosmap_locations module-dosmap_locations-{{ module }}"{% if attr_ID %} id="{{ attr_ID }}"{% endif %}>
+    <div class="module-dosmap_locations-wrap">
+        <div class="module-dosmap_locations-content">
+            {% if heading_title %}
+                <h2>{{ heading_title }}</h2>
+            {% endif %}
+
+            {% if description %}
+                <div class="description">{{ description }}</div>
+            {% endif %}
+
+            <div class="dosmap_locations-content">
+                <div class="module-dosmap_locations-map">
+                    <div class="module-dosmap_locations-map-inner">
+                        <div id="dosmap-locations-map-{{ module }}" class="dosmap-locations-map-module"></div>
+                    </div>
+
+                    <div class="module-dosmap_locations-list">
+                        {% if locations %}
+                            <ul class="list">
+                                {% for location in locations %}
+                                    <li class="item">
+                                        <button type="button" data-id="{{ location.location_id }}">{{ location.title }}</button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="module-dosmap_locations-navigation">
+                                <div class="module-dosmap_locations-pagination">{{ pagination }}</div>
+                                <div class="module-dosmap_locations-results">{{ results }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript"><!--
+        // Error.
+        const error_coords_nfound = '{{ error_coords_nfound }}';
+
+        // Module Data.
+        const dosmapModuleIndex = '{{ module }}';
+        const dosmapVerAPI = '{{ ver_api }}';
+        const dosmapInitLatitude = '{{ dosmap_init_latitude }}';
+        const dosmapInitLongitude = '{{ dosmap_init_longitude }}';
+        const dosmapInitZoom = '{{ dosmap_init_zoom }}';
+        const dosmapClusterization = '{{ dosmap_clusterization }}';
+        const dosmapBaloonInfo = '{{ dosmap_baloon_info }}';
+        const dosmapPanZoom = '{{ dosmap_pan_zoom }}';
+
+        // Map URLs.
+        const dosmapUrlPoints = '{{ url_dosmap_points }}';
+        const dosmapUrlIconPoints = '{{ url_icon_point }}';
+        const dosmapUrlIconClusters = '{{ url_icon_cluster }}';
+    //--</script>
+</div>

@@ -1,0 +1,652 @@
+{{ header }}
+{{ column_left }}
+
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="float-end">
+                <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-light d-lg-none" data-bs-original-title="{{ button_filter }}" aria-label="{{ button_filter }}" onclick="$('#filter-location').toggleClass('d-none');" style="margin: 0 20px 0 0;">
+                    <i class="fas fa-filter"></i>
+                </button>
+                <button type="button" data-bs-toggle="tooltip" title="" id="button-update_json" class="btn btn-success" data-bs-original-title="{{ button_update_json }}" aria-label="{{ button_update_json }}" style="margin: 0 20px 0 0;">
+                    <i class="fas fa-map-marker-alt"></i>
+                </button>
+                <button type="submit" form="form-module" data-bs-toggle="tooltip" title="" class="btn btn-primary" data-bs-original-title="{{ button_save_sets }}" aria-label="{{ button_save_sets }}">
+                    <i class="fas fa-save"></i>
+                </button>
+                <a href="{{ cancel }}" data-bs-toggle="tooltip" title="" class="btn btn-light" data-bs-original-title="{{ button_cancel }}" aria-label="{{ button_cancel }}">
+                    <i class="fas fa-reply"></i>
+                </a>
+            </div>
+
+            <h1>{{ heading_title }}</h1>
+
+            <ol class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div id="alert-modal"></div>
+
+        {% if error_warning %}
+            <div class="alert alert-danger alert-dismissible">
+                <i class="fas fa-exclamation-circle"></i> {{ error_warning }} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
+        {% if error_required %}
+            <div class="alert alert-danger alert-dismissible">
+                <i class="fas fa-exclamation-circle"></i> {{ error_required }} <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-pencil-alt"></i> {{ text_edit }}</div>
+
+            <div class="card-body">
+                <form action="{{ action }}" method="post" id="form-module" data-oc-toggle="ajax">
+                    <ul id="tabs-main" class="nav nav-tabs">
+                        <li class="nav-item nav-general">
+                            <a href="#tab-general" data-bs-toggle="tab" class="nav-link active">{{ tab_general }}</a>
+                        </li>
+
+                        <li class="nav-item nav-locations">
+                            <a href="#tab-locations" data-bs-toggle="tab" class="nav-link">{{ tab_locations }}</a>
+                        </li>
+
+                        <li class="nav-item nav-add_location">
+                            <a href="#tab-add_location" data-bs-toggle="tab" class="nav-link">{{ tab_add_location }}</a>
+                        </li>
+
+                        <li class="nav-item nav-settings">
+                            <a href="#tab-settings" data-bs-toggle="tab" class="nav-link">{{ tab_settings }}</a>
+                        </li>
+                    </ul>
+
+                    <div id="tab-content-main" class="tab-content">
+                        <div class="tab-pane active" id="tab-general">
+                            <div class="row mb-3 required">
+                                <label class="col-sm-2 col-form-label" for="input-name">{{ entry_general_name }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_general_name }}" id="input-name" class="form-control" />
+                                    <div id="error-name" class="invalid-feedback"></div>
+
+                                    {% if error_name %}
+                                        <div class="text-danger">{{ error_name }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-attr_ID">{{ entry_attr_id }}</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="attr_ID" value="{{ attr_ID }}" placeholder="{{ entry_attr_id }}" id="input-attr_ID" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="tab-pane">
+                                <ul class="nav nav-tabs" id="language-general">
+                                    {% for language in languages %}
+                                        <li class="nav-item">
+                                            <a href="#language_general_{{ language.language_id }}" data-bs-toggle="tab" class="nav-link{% if loop.first %} active{% endif %}">
+                                                <img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" />
+                                                <span>{{ language.name }}</span>
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+
+                                <div class="tab-content tab-content-general">
+                                    {% for language in languages %}
+                                        <div class="tab-pane{% if loop.first %} active{% endif %}" id="language_general_{{ language.language_id }}">
+                                            <div class="row mb-3">
+                                                <label class="col-sm-2 col-form-label" for="input-title{{ language.language_id }}">{{ entry_general_title }}</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" name="module_description[{{ language.language_id }}][title]" placeholder="{{ entry_general_title }}" id="input-heading{{ language.language_id }}" value="{{ module_description[language.language_id] ? module_description[language.language_id].title }}" class="form-control" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <label class="col-sm-2 col-form-label" for="input-description{{ language.language_id }}">{{ entry_general_descr }}</label>
+                                                <div class="col-sm-10">
+                                                    <textarea name="module_description[{{ language.language_id }}][description]" placeholder="{{ entry_general_descr }}" id="input-description{{ language.language_id }}" data-oc-toggle="ckeditor" data-lang="{{ language.code }}" class="form-control">{{ module_description[language.language_id] ? module_description[language.language_id].description }}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-locations">
+                            <div class="locations-content">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div id="filter-location" class="col-lg-3 col-md-12 order-lg-last d-none d-lg-block mb-3">
+                                            <div class="card">
+                                                <div class="card-header"><i class="fas fa-filter"></i> {{ entry_filter }}</div>
+
+                                                <div class="card-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="input-filter-title">{{ entry_title }}</label>
+                                                        <input type="text" name="filter[filter_title]" value="{{ filter_title }}" placeholder="{{ text_filter_title }}" list="list-title" data-oc-target="autocomplete-title" id="input-filter-title" class="form-control" />
+                                                        <datalist id="list-title"></datalist>
+                                                        <ul id="autocomplete-title" class="dropdown-menu"></ul>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="input-filter-baloon_header">{{ entry_baloon_header }}</label>
+                                                        <input type="text" name="filter[filter_baloon_header]" value="{{ filter_baloon_header }}" placeholder="{{ text_filter_header }}" list="list-baloon_header" data-oc-target="autocomplete-baloon_header" id="input-filter-baloon_header" class="form-control" />
+                                                        <datalist id="list-baloon_header"></datalist>
+                                                        <ul id="autocomplete-baloon_header" class="dropdown-menu"></ul>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="input-filter-baloon_footer">{{ entry_baloon_footer }}</label>
+                                                        <input type="text" name="filter[filter_baloon_footer]" value="{{ filter_baloon_footer }}" placeholder="{{ text_filter_footer }}" list="list-baloon_footer" data-oc-target="autocomplete-baloon_footer" id="input-filter-baloon_footer" class="form-control" />
+                                                        <datalist id="list-baloon_footer"></datalist>
+                                                        <ul id="autocomplete-baloon_footer" class="dropdown-menu"></ul>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="input-filter-latitude">{{ entry_latitude }}</label>
+                                                        <input type="number" step="0.000001" name="filter[filter_latitude]" value="{{ filter_latitude }}" placeholder="{{ text_filter_lat }}" id="input-filter-latitude" class="form-control" />
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="input-filter-longitude">{{ entry_longitude }}</label>
+                                                        <input type="number" step="0.000001" name="filter[filter_longitude]" value="{{ filter_longitude }}" placeholder="{{ text_filter_long }}" id="input-filter-longitude" class="form-control" />
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="input-filter-status">{{ entry_status }}</label>
+                                                        <select name="filter[filter_status]" id="input-filter-status" class="form-select">
+                                                            <option value="">{{ text_select }}</option>
+
+                                                            {% if filter_status == '1' %}
+                                                                <option value="1" selected="selected">{{ text_enabled }}</option>
+                                                            {% else %}
+                                                                <option value="1">{{ text_enabled }}</option>
+                                                            {% endif %}
+
+                                                            {% if filter_status == '0' %}
+                                                                <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                            {% else %}
+                                                                <option value="0">{{ text_disabled }}</option>
+                                                            {% endif %}
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="mb-3 text-end">
+                                                        <button type="button" id="button-filter" class="btn btn-info">
+                                                            <i class="fas fa-filter"></i>
+                                                            <span>{{ button_filter }}</span>
+                                                        </button>
+                                                        <button type="button" id="button-filter-reset" class="btn btn-danger">
+                                                            <i class="fas fa-times"></i>
+                                                            <span>{{ button_filter_reset }}</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col col-lg-9 col-md-12">
+                                            <div class="card">
+                                                <div class="card-header"><i class="fas fa-list"></i> {{ entry_locations }}</div>
+
+                                                <div class="card-body">
+                                                    {% if locations %}
+                                                        <div class="text-end" style="padding: 0 10px 15px;">
+                                                            <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-info add_location-list nformat" data-bs-original-title="{{ button_add_location }}" aria-label="{{ button_add_location }}">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
+
+                                                            <button type="button" data-bs-toggle="tooltip" title="" class="btn btn-danger remove_locations-list" data-bs-original-title="{{ button_remove_check }}" aria-label="{{ button_remove_check }}">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </button>
+                                                        </div>
+
+                                                        <div id="locations-table" class="panel-body-inner panel-body-inner-locations" style="overflow: auto;">
+                                                            <table id="locations-list" class="table table-striped table-bordered table-hover locations-list" style="min-width: 800px;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td class="text-center" style="width: 1px;">
+                                                                            <input type="checkbox" class="form-check-input" onclick="$('#locations-list input[name*=\'location_selected\']').prop('checked', $(this).prop('checked'));" />
+                                                                        </td>
+                                                                        <td class="text-center" style="width: 90px;">
+                                                                            {% if sort == 'location_id' %}
+                                                                                <a href="{{ sort_location_id }}" class="{{ order|lower }}">{{ entry_location_id }}</a>
+                                                                            {% else %}
+                                                                                <a href="{{ sort_location_id }}">{{ entry_location_id }}</a>
+                                                                            {% endif %}
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            {% if sort == 'title' %}
+                                                                                <a href="{{ sort_title }}" class="{{ order|lower }}">{{ entry_title }}</a>
+                                                                            {% else %}
+                                                                                <a href="{{ sort_title }}">{{ entry_title }}</a>
+                                                                            {% endif %}
+
+                                                                            <span>/</span>
+                                                                            <span>{{ entry_addition_info }}</span>
+                                                                        </td>
+                                                                        <td class="text-center" style="width: 140px;">
+                                                                            {% if sort == 'status' %}
+                                                                                <a href="{{ sort_status }}" class="{{ order|lower }}">{{ entry_status }}</a>
+                                                                            {% else %}
+                                                                                <a href="{{ sort_status }}">{{ entry_status }}</a>
+                                                                            {% endif %}
+                                                                        </td>
+                                                                        <td class="text-end buttons" style="width: 150px;">{{ entry_action }}</td>
+                                                                    </tr>
+                                                                </thead>
+
+                                                                <tbody>
+                                                                    {% for location in locations %}
+                                                                        <tr id="location-{{ location.location_id }}">
+                                                                            <td class="text-center">
+                                                                                {% if location.location_id in selected %}
+                                                                                    <input type="checkbox" name="location_selected[{{ location.location_id }}][]" value="{{ location.location_id }}" class="form-check-input" checked="checked" />
+                                                                                {% else %}
+                                                                                    <input type="checkbox" name="location_selected[{{ location.location_id }}][]" value="{{ location.location_id }}" class="form-check-input" />
+                                                                                {% endif %}
+                                                                            </td>
+
+                                                                            <td class="text-center">
+                                                                                <div class="location_id">{{ location.location_id }}</div>
+                                                                            </td>
+
+                                                                            <td class="text-start addition_info">
+                                                                                <div class="location_title">{{ location.description.title }}</div>
+
+                                                                                <div class="location_info" style="display: none;">
+                                                                                    <div class="location_description">
+                                                                                        <div class="tabs-location_description">
+                                                                                            <ul class="nav nav-tabs" id="language-location-{{ location.location_id }}" style="margin: 0;">
+                                                                                                {% for language in languages %}
+                                                                                                    <li class="nav-item">
+                                                                                                        <a href="#language_location_{{ location.location_id }}_{{ language.language_id }}" data-bs-toggle="tab" class="nav-link{% if loop.first %} active{% endif %}">
+                                                                                                            <img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" />
+                                                                                                            <span>{{ language.name }}</span>
+                                                                                                        </a>
+                                                                                                    </li>
+                                                                                                {% endfor %}
+                                                                                            </ul>
+                                                                                        </div>
+
+                                                                                        <div class="tab-content tab-content-location_description">
+                                                                                            {% for language in languages %}
+                                                                                                <div class="tab-pane{% if loop.first %} active{% endif %}" id="language_location_{{ location.location_id }}_{{ language.language_id }}">
+                                                                                                    <div>
+                                                                                                        <label for="input-location-{{ location.location_id }}-{{ language.language_id }}-title" class="form-label">
+                                                                                                            <b style="color: #f00;">*</b> {{ entry_title }}
+                                                                                                        </label>
+                                                                                                        <input type="text" name="location_data[{{ location.location_id }}][description][{{ language.language_id }}][title]" placeholder="{{ entry_title }}" id="input-location-{{ location.location_id }}-{{ language.language_id }}-title" value="{% if language.language_id == location.description.language_id %}{{ location.description.title }}{% endif %}" class="form-control field-section-locations field-title field-title-{{ language.language_id }}" />
+                                                                                                    </div>
+
+                                                                                                    <div>
+                                                                                                        <label for="input-location-{{ location.location_id }}-{{ language.language_id }}-baloon_header" class="form-label">{{ entry_baloon_header }}</label>
+                                                                                                        <input type="text" name="location_data[{{ location.location_id }}][description][{{ language.language_id }}][baloon_header]" placeholder="{{ entry_baloon_header }}" id="input-location-{{ location.location_id }}-{{ language.language_id }}-baloon_header" value="{% if language.language_id == location.description.language_id %}{{ location.description.baloon_header }}{% endif %}" class="form-control field-section-locations field-baloon_header field-baloon_header-{{ language.language_id }}" />
+                                                                                                    </div>
+
+                                                                                                    <div>
+                                                                                                        <label for="input-location-{{ location.location_id }}-{{ language.language_id }}-baloon_footer" class="form-label">{{ entry_baloon_footer }}</label>
+                                                                                                        <input type="text" name="location_data[{{ location.location_id }}][description][{{ language.language_id }}][baloon_footer]" placeholder="{{ entry_baloon_footer }}" id="input-location-{{ location.location_id }}-{{ language.language_id }}-baloon_footer" value="{% if language.language_id == location.description.language_id %}{{ location.description.baloon_footer }}{% endif %}" class="form-control field-section-locations field-baloon_footer field-baloon_footer-{{ language.language_id }}" />
+                                                                                                    </div>
+
+                                                                                                    <div>
+                                                                                                        <label for="input-location-{{ location.location_id }}-{{ language.language_id }}-baloon_body" class="form-label">{{ entry_baloon_body }}</label>
+                                                                                                        <textarea name="location_data[{{ location.location_id }}][description][{{ language.language_id }}][baloon_body]" placeholder="{{ entry_baloon_body }}" id="input-location-{{ location.location_id }}-{{ language.language_id }}-baloon_body" data-lang="{{ language.code }}" class="form-control field-section-locations field-baloon_body field-baloon_body-{{ language.language_id }}" style="height: 60px; background-color: #fff;">{% if language.language_id == location.description.language_id %}{{ location.description.baloon_body }}{% endif %}</textarea>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            {% endfor %}
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <div class="location_coords">
+                                                                                        <div>
+                                                                                            <label for="input-location-{{ location.location_id }}-latitude" class="form-label">
+                                                                                                <b style="color: #f00;">*</b> {{ entry_latitude }}
+                                                                                            </label>
+                                                                                            <input type="number" step="0.000001" name="location_data[{{ location.location_id }}][latitude]" placeholder="{{ entry_latitude }}" id="input-location-{{ location.location_id }}-latitude" value="{{ location.latitude }}" class="form-control field-section-locations field-latitude" />
+                                                                                        </div>
+
+                                                                                        <div>
+                                                                                            <label for="input-location-{{ location.location_id }}-longitude" class="form-label">
+                                                                                                <b style="color: #f00;">*</b> {{ entry_longitude }}
+                                                                                            </label>
+                                                                                            <input type="number" step="0.000001" name="location_data[{{ location.location_id }}][longitude]" placeholder="{{ entry_longitude }}" id="input-location-{{ location.location_id }}-longitude" value="{{ location.longitude }}" class="form-control field-section-locations field-longitude" />
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <div class="row mb-3-hidden" style="display: none !important;">
+                                                                                        <input type="hidden" name="location_data[{{ location.location_id }}][module_id]" id="input-location-{{ location.location_id }}-module_id" value="{{ module_id }}" class="field-section-locations field-module_id field-hidden" style="display: none !important;" />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+
+                                                                            <td class="text-start">
+                                                                                <select name="location_data[{{ location.location_id }}][status]" id="input-location-{{ location.location_id }}-status" class="form-select field-section-locations field-status">
+                                                                                    {% if location.status %}
+                                                                                        <option value="1" style="color: #0b970b" selected="selected">{{ text_enabled }}</option>
+                                                                                        <option value="0" style="color: #ad0404">{{ text_disabled }}</option>
+                                                                                    {% else %}
+                                                                                        <option value="1" style="color: #0b970b">{{ text_enabled }}</option>
+                                                                                        <option value="0" style="color: #ad0404" selected="selected">{{ text_disabled }}</option>
+                                                                                    {% endif %}
+                                                                                </select>
+                                                                            </td>
+
+                                                                            <td class="text-end buttons">
+                                                                                <button type="button" data-bs-toggle="tooltip" title="" data-bs-original-title="{{ button_save }}" aria-label="{{ button_save }}" class="btn btn-info save">
+                                                                                    <i class="fas fa-save"></i>
+                                                                                </button>
+                                                                                <button type="button" data-bs-toggle="tooltip" title="" data-bs-original-title="{{ button_edit }}" aria-label="{{ button_edit }}" class="btn btn-warning edit">
+                                                                                    <i class="fas fa-pencil-alt"></i>
+                                                                                </button>
+                                                                                <button type="button" data-bs-toggle="tooltip" title="" data-bs-original-title="{{ button_remove }}" aria-label="{{ button_remove }}" class="btn btn-danger remove">
+                                                                                    <i class="fas fa-trash-alt"></i>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% endfor %}
+                                                                </tbody>
+                                                            </table>
+
+                                                            <div class="row" style="margin-right: 0; margin-left: 0;">
+                                                                <div class="col-sm-8 text-start">{{ pagination }}</div>
+                                                                <div class="col-sm-4 text-end">{{ results }}</div>
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="locations-empty">
+                                                            <div>{{ text_loc_list_empty }}</div>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-add_location">
+                            <ul class="nav nav-tabs" id="language-add_location">
+                                {% for language in languages %}
+                                    <li class="nav-item">
+                                        <a href="#language_add_location_{{ language.language_id }}" data-bs-toggle="tab" class="nav-link{% if loop.first %} active{% endif %}">
+                                            <img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" />
+                                            <span>{{ language.name }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="tab-content tab-content-add_location">
+                                {% for language in languages %}
+                                    <div class="tab-pane{% if loop.first %} active{% endif %}" id="language_add_location_{{ language.language_id }}">
+                                        <div class="row mb-3 required">
+                                            <label class="col-sm-2 col-form-label" for="input-title_{{ language.language_id }}">{{ entry_title }}</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="add_location[description][{{ language.language_id }}][title]" placeholder="{{ entry_title }}" id="input-title_{{ language.language_id }}" value="{{ add_location['description'][language.language_id] ? add_location['description'][language.language_id].title }}" class="form-control field-section-add_location field-title field-title-{{ language.language_id }}" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-sm-2 col-form-label" for="input-baloon_header_{{ language.language_id }}">{{ entry_baloon_header }}</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="add_location[description][{{ language.language_id }}][baloon_header]" placeholder="{{ entry_baloon_header }}" id="input-baloon_header_{{ language.language_id }}" value="{{ add_location['description'][language.language_id] ? add_location['description'][language.language_id].baloon_header }}" class="form-control field-section-add_location field-baloon_header field-baloon_header-{{ language.language_id }}" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-sm-2 col-form-label" for="input-baloon_body_{{ language.language_id }}">{{ entry_baloon_body }}</label>
+                                            <div class="col-sm-10">
+                                                <textarea name="add_location[description][{{ language.language_id }}][baloon_body]" placeholder="{{ entry_baloon_body }}" id="input-baloon_body_{{ language.language_id }}" data-oc-toggle="ckeditor" data-lang="{{ language.code }}" class="form-control field-section-add_location field-baloon_body field-baloon_body-{{ language.language_id }}">{{ add_location['description'][language.language_id] ? add_location['description'][language.language_id].baloon_body }}</textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-sm-2 col-form-label" for="input-baloon_footer_{{ language.language_id }}">{{ entry_baloon_footer }}</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="add_location[description][{{ language.language_id }}][baloon_footer]" placeholder="{{ entry_baloon_footer }}" id="input-baloon_footer_{{ language.language_id }}" value="{{ add_location['description'][language.language_id] ? add_location['description'][language.language_id].baloon_footer }}" class="form-control field-section-add_location field-baloon_footer field-baloon_footer-{{ language.language_id }}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <hr style="height: 1px; background-color: #ededed; border: none; opacity: 1;">
+
+                            <div class="row mb-3 required">
+                                <label class="col-sm-2 col-form-label" for="input-add_location-latitude">{{ entry_latitude }}</label>
+                                <div class="col-sm-10">
+                                    <input type="number" step="0.000001" name="add_location[latitude]" placeholder="{{ entry_latitude }}" id="input-add_location-latitude" value="{{ add_location.latitude ? add_location.latitude }}" class="form-control field-section-add_location field-latitude" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3 required">
+                                <label class="col-sm-2 col-form-label" for="input-add_location-longitude">{{ entry_longitude }}</label>
+                                <div class="col-sm-10">
+                                    <input type="number" step="0.000001" name="add_location[longitude]" placeholder="{{ entry_longitude }}" id="input-add_location-longitude" value="{{ add_location.longitude ? add_location.longitude }}" class="form-control field-section-add_location field-longitude" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-add_location-status">{{ entry_status }}</label>
+                                <div class="col-sm-10">
+                                    <select name="add_location[status]" id="input-add_location-status" class="form-select field-section-add_location field-status">
+                                        <option value="1">{{ text_enabled }}</option>
+                                        <option value="0">{{ text_disabled }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3-hidden" style="display: none !important;">
+                                <input type="hidden" name="add_location[module_id]" id="input-add_location-module_id" value="{{ module_id }}" class="field-section-add_location field-module_id field-hidden" style="display: none !important;" />
+                            </div>
+
+                            <div class="text-end" style="margin: 20px 0;">
+                                <button type="button" class="btn btn-info button-add_location">{{ button_add }} <i class="fas fa-plus-circle"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-settings">
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-dosmap_locs_status">{{ entry_status }}</label>
+                                <div class="col-sm-10">
+                                    <select name="status" id="input-dosmap_locs_status" class="form-select">
+                                        {% if status %}
+                                            <option value="1" selected="selected">{{ text_enabled }}</option>
+                                            <option value="0">{{ text_disabled }}</option>
+                                        {% else %}
+                                            <option value="1">{{ text_enabled }}</option>
+                                            <option value="0" selected="selected">{{ text_disabled }}</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-dosmap_locs_ver_api">{{ entry_ver_api }}</label>
+                                <div class="col-sm-10">
+                                    <select name="ver_api" id="input-dosmap_locs_ver_api" class="form-select">
+                                        <option value="leaflet_194" {% if ver_api == 'leaflet_194' %}selected="selected"{% endif %}>Leaflet v1.9.4</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-keyapi">{{ entry_key_api }}</label>
+                                <div class="col-sm-10">
+                                    <select name="key_api" id="input-keyapi" class="form-select">
+                                        <option value="0">{{ text_disabled }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-dosmap_locs_limit_site">{{ entry_limit_site }}</label>
+                                <div class="col-sm-10">
+                                    <select name="limit_site" id="input-dosmap_locs_limit_site" class="form-select">
+                                        <option value="24" {% if limit_site == 24 %}selected="selected"{% endif %}>24</option>
+                                        <option value="48" {% if limit_site == 48 %}selected="selected"{% endif %}>48</option>
+                                        <option value="96" {% if limit_site == 96 %}selected="selected"{% endif %}>96</option>
+                                        <option value="200" {% if limit_site == 200 %}selected="selected"{% endif %}>200</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-dosmap_locs_limit_admin">{{ entry_limit_admin }}</label>
+                                <div class="col-sm-10">
+                                    <select name="limit_admin" id="input-dosmap_locs_limit_admin" class="form-select">
+                                        <option value="24" {% if limit_admin == 24 %}selected="selected"{% endif %}>24</option>
+                                        <option value="48" {% if limit_admin == 48 %}selected="selected"{% endif %}>48</option>
+                                        <option value="96" {% if limit_admin == 96 %}selected="selected"{% endif %}>96</option>
+                                        <option value="200" {% if limit_admin == 200 %}selected="selected"{% endif %}>200</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-dosmap_locs_json_coords">{{ entry_json_coords }}</label>
+                                <div class="col-sm-10">
+                                    <select name="json_coords" id="input-dosmap_locs_json_coords" class="form-select">
+                                        <option value="0" {% if json_coords == 0 %}selected="selected"{% endif %}>{{ text_update_not }}</option>
+                                        <option value="1" {% if json_coords == 1 %}selected="selected"{% endif %}>{{ text_update_auto }}</option>
+                                        <option value="2" {% if json_coords == 2 %}selected="selected"{% endif %}>{{ text_update_manual }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label">{{ entry_map_settings }}</label>
+                                <div class="col-sm-10">
+                                    <div class="map_settings-inner">
+                                        <label for="input-dosmap_locs_map_language" style="margin: 0 0 5px;">{{ entry_language }}</label>
+                                        <div>
+                                            <select name="map_language" id="input-dosmap_locs_map_language" class="form-select">
+                                                <option value="osm" {% if map_language == 'osm' %}selected="selected"{% endif %}>OpenStreetMap</option>
+                                            </select>
+                                        </div>
+                                        <div class="map_settings-custom" style="margin: 5px 0 0; {% if map_language != '--' %}display: none;{% endif %}">
+                                            <input type="text" name="map_language_custom" placeholder="{{ entry_language_code }}" id="input-dosmap_locs_map_language_custom" value="{{ map_language_custom }}" class="form-control" />
+                                            <div style="color: #919191; font-size: 0.9em; padding: 3px 5px 0;">{{ help_language_code }}</div>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin: 20px 0 0 0">
+                                        <label for="input-dosmap_locs_clusterization" style="margin: 0 0 5px;">{{ entry_clusterization }}</label>
+                                        <div>
+                                            <select name="clusterization" id="input-dosmap_locs_clusterization" class="form-select">
+                                                {% if clusterization %}
+                                                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                                                    <option value="0">{{ text_disabled }}</option>
+                                                {% else %}
+                                                    <option value="1">{{ text_enabled }}</option>
+                                                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin: 20px 0 0 0">
+                                        <label for="input-dosmap_locs_baloon_info" style="margin: 0 0 5px;">{{ entry_baloon_info }}</label>
+                                        <div>
+                                            <select name="baloon_info" id="input-dosmap_locs_baloon_info" class="form-select">
+                                                {% if baloon_info %}
+                                                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                                                    <option value="0">{{ text_disabled }}</option>
+                                                {% else %}
+                                                    <option value="1">{{ text_enabled }}</option>
+                                                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin: 20px 0 0 0">
+                                        <label for="input-dosmap_locs_mapinit_latitude" style="margin: 0 0 5px;">{{ entry_init_coords }}</label>
+                                        <div>
+                                            <input type="number" step="0.000001" name="mapinit_latitude" placeholder="{{ entry_latitude }}" id="input-dosmap_locs_mapinit_latitude" value="{{ mapinit_latitude }}" class="form-control" style="width: 100%; max-width: 200px; display: inline-block;" />
+                                            <span>,</span>
+                                            <input type="number" step="0.000001" name="mapinit_longitude" placeholder="{{ entry_longitude }}" id="input-dosmap_locs_mapinit_longitude" value="{{ mapinit_longitude }}" class="form-control" style="width: 100%; max-width: 200px; display: inline-block;" />
+                                        </div>
+                                    </div>
+
+                                    <div style="margin: 20px 0 0 0">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <label for="input-dosmap_locs_mapinit_zoom" style="margin: 0 0 5px;">{{ entry_init_zoom }}</label>
+                                                <div>
+                                                    <input type="number" step="1" min="1" max="30" name="mapinit_zoom" placeholder="{{ entry_init_zoom }}" id="input-dosmap_locs_mapinit_zoom" value="{{ mapinit_zoom }}" class="form-control" style="display: block;" />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="input-dosmap_locs_mappan_zoom" style="margin: 0 0 5px;">{{ entry_pan_zoom }}</label>
+                                                <div>
+                                                    <input type="number" step="1" min="1" max="30" name="mappan_zoom" placeholder="{{ entry_pan_zoom }}" id="input-dosmap_locs_mappan_zoom" value="{{ mappan_zoom }}" class="form-control" style="display: block;" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="input-dosmap_locs_data_delete">{{ entry_data_delete }}</label>
+                                <div class="col-sm-10">
+                                    <div class="input-group">
+                                        <div id="input-dosmap_locs_data_delete" class="form-check form-switch form-switch-lg" style="margin-top: 10px;">
+                                            {% if data_delete %}
+                                                <input type="checkbox" name="module_dosmap_locations_data_delete" value="1" class="form-check-input" checked="checked">
+                                            {% else %}
+                                                <input type="checkbox" name="module_dosmap_locations_data_delete" value="1" class="form-check-input">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript"><!--
+        jQuery(function($) {
+            $('textarea[data-oc-toggle=\'ckeditor\']').ckeditor();
+        });
+    //--></script>
+
+    <script type="text/javascript"><!--
+        // Alert.
+        const alert_confirm_rem    = '{{ alert_confirm_rem }}';
+        const alert_confirm_remove = '{{ alert_confirm_remove }}';
+
+        // Error.
+        const error_mes_remove     = '{{ error_mes_remove }}';
+
+        // Action.
+        const action_add           = '{{ action_add }}';
+        const action_open          = '{{ action_open }}';
+        const action_edit          = '{{ action_edit }}';
+        const action_delete        = '{{ action_delete }}';
+        const action_update_json   = '{{ action_update_json }}';
+
+        // Filter URL.
+        const filterURL            = '{{ filter_url }}';
+        const filterResetURL       = '{{ filter_reset_url }}';
+        const filterAutocomplete   = '{{ filter_autocomplete }}';
+    //--></script>
+</div>
+
+{{ footer }}
