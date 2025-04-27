@@ -33,7 +33,7 @@
     <h3>JavaScript library:</h3>
     <p>
         <ul>
-            <li>Leaflet</li>
+            <li>Leaflet 1.9.4</li>
         </ul>
     </p>
     <h3>Compatibility:</h3>
